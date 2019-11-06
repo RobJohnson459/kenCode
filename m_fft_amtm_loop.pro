@@ -46,33 +46,16 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
 
-  TIC
-  ;a='Jan12-13'
-   ;a='Aug15-16'
-;  FILE='/home0/ken/post-data/AMTM'
- ; restore,'E:\MCM AMTM 2017\Jun19-20\Processed\Temp\Jun19-20BandOH.sav'
-  ;restore, 'C:\Users\Masaru\Desktop\PFRR_FFTdata\January2018\Jan06-07\BIN\Band_Jan06-07.sav'
-  ;restore, 'C:\Users\Masaru\Desktop\'+a+'\Processed\Temp\'+a+'TempOH2hr.sav'
-  ;restore, 'C:\Users\Masaru\Desktop\PFRR_FFTdata\December2017\'+a+'\'+a+'TempOH.sav'
-  ;restore, 'C:\Users\Masaru\Desktop\PFRR_FFTdata\SuperSoaker\'+a+'TempOH.sav'
 
-  ;img = data4
-  ;FILE='/home0/ken/post-data/ASI'
+
   imagenum = 30
   datasize=size(img)
   datatime=datasize(3)
   ddt=floor(datatime/imagenum)
   FOR q=0,ddt-1 DO BEGIN
-;q=1
     IF q gt 226 THEN BEGIN
       STOP
     ENDIF
-    ;FILE='C:\Users\Masaru\Desktop\MCM_AMTM_2017\'+a+'\TempOH2hrsmooth330\TempOH'+string(q)
-   ; FILE='C:\Users\Masaru\Desktop\Hour18'
-    ;FILE='C:\Users\Masaru\Desktop\PFRR_FFTdata\November2017\'+a+'\'
-    ;FILE='C:\Users\Masaru\Desktop\PFRR_FFTdata\January2018\'+a+'\Results\TempOH'+string(q)
-     ;FILE='C:\Users\Masaru\Desktop\MCM_AMTM_2018\July2018\Jul16-17(Fix)\TempOH'+string(q)
-    ;FILE = 'C:\Vanessa\HalleyResults\August2012\'+a+'\ASI'+string(q)
     FILE = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'+string(q)
    
     img5=img(*,*,q*imagenum:(q+4)*imagenum)
