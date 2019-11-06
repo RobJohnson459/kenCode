@@ -190,6 +190,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   endfor
   ;---------------Prewhitening process----------------------------------------------------------------;
 
+  print, 'pre-whitening ...', FORMAT='(A,$)'
   if (nt-1) eq (floor((nt-1)/2.0)*2) then begin ;even case
     ran1=icen-(nt-1)/2 & ran2=icen+(nt-1)/2 & ran3=zpt/2-(nt-1)/2 & ran4=zpt/2+(nt-1)/2
   endif else begin ;odd case
@@ -203,7 +204,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
     img3(*,*,pw1)=convol(prewhite1,fker) ;Prewhitening result
 
   endfor
-  print, 'pre-whitening done'
+  print, ' done'
   
   
   ;---------------------Zero padding------------------------------------------------------------------;
@@ -214,17 +215,20 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
   ;--------------------Apply Hanning window (not applied in time dimension)---------------------------;
 
+  print, 'hanning Window ... ', FORMAT='(A,$)'
   for le1=ran3(0),ran4(0) do fa1(rr1:rr2,rr1:rr2,le1)=img3(*,*,le1)*HANNING(nx,ny)
   
-  print, 'hanning window done'
+  print, 'done'
   ;---------------------3D FFT------------------------------------------------------------------------;
 
+  print, '3D FFT ...', FORMAT='(A,$)'
   fft_result1(*,*,*)=2.0*((abs(FFT(fa1(*,*,*),/center)))^2) ;Initial FFT result for whole spectrum (k,l,w)
   fvalue=((float(zpx)^2)*float(zpt))/((float(nx)^2)*float((nt))) ;Correction factor
 
-  print, '3D FFT done'
+  print, 'done'
   ;--------------------Recoloring----------------------------------------------------------------------;
 
+  print, 'recoloring ... ', FORMAT='(A,$)'
   for le2=0,zpt-1 do fft_result1(1:zpx-1,1:zpy-1,le2)=fft_result1(1:zpx-1,1:zpy-1,le2)*(((float(zpx*dx)*float(zpy*dy))*float(zpt))*fvalue(0))*float(tres)/fres(*,*)
   sr1=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpx/2+fix(float(zpx*dx)/float(LH_min))]
   fft_result2=fft_result1(sr1(0):sr1(1),sr1(0):sr1(1),tr1(0):tr1(1)) ;FFT result limited between LH_min and LH_max
@@ -294,7 +298,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   xgo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*cos(angle1a(*,*,*)))
   ygo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*sin(angle1a(*,*,*)))
 
-  print,'recoloring done'
+  print,'done'
   ;---------------Masking---------------------------------------------------------------------------------;
 
   mask1a=fltarr(xy1,xy1)
@@ -323,6 +327,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
   ;------------------------Conversion to phase speed domain----------------------------------------------------------------------------------;
 
+  print, 'conversion to phase speed ... ', FORMAT='(A,$)'
   for ca4=0,tt1-1 do begin
     for ca1=0,xy1-1 do begin
       for ca2=0,xy1-1 do begin
@@ -335,7 +340,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   endfor
   
   
-  print, 'conversion to phase speed done'
+  print, 'done'
   
   
   v3(where(v3 eq 0.0))=1.0
@@ -394,12 +399,16 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   interpol_table=interpolate_table
 
   ;------Get the convolution result-----------------------------------------------------------------;
+  
+  print, 'convolution ... ', FORMAT='(A,$)'
   array1_int=convol_result
   fsize_int=size(array1_int) & sz1_int=fsize_int(1) & tt1_int=fsize_int(3)
   sr1_int=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpy/2+fix(float(zpy*dy)/float(LH_min))]
 
-  print, 'convolution done'
+  print, 'done'
   ;----------------------Interpolation-------------------------------------------------------------;
+  
+  print, 'interpolation', FORMAT='(A,$)'
   if keyword_set(interpolation) then begin   ;Matsuda et al., 2014 original interpolation method
     sz2_int=sz1*2-1
     sz3_int=(sz1-1)/2
@@ -459,7 +468,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
     endfor
   endelse
 
-  print, 'almost there'
+  print, 'done'
   ;----------------Calculate the 2D phase velocity-----------------------------------------------------------;
 
   total_result_new=alog10(total(interpol_result(*,*,*)/float(zpt*tres),3)+1.0e-22) ;2D Phase speed array (vx,vy)
