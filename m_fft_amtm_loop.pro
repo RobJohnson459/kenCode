@@ -52,7 +52,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 imageNum = 30
 dataSize=size(img)
 dataTime=dataSize(3)
-ddt=floor(dataTime/dataSize)
+ddt=floor(dataTime/imageNum)
 FOR q=0,ddt-1 DO BEGIN
   IF q GT 226 THEN BEGIN
     STOP
@@ -242,7 +242,6 @@ FOR q=0,ddt-1 DO BEGIN
   jacobian1=fltarr(xy1,xy1,tt1)  ;Jacobian
   xgo1=intarr(xy1,xy1,tt1)       ;Distance from the center in k
   ygo1=intarr(xy1,xy1,tt1)       ;Distance from the center in l
-
   FOR i=0,tt1-1 DO BEGIN
 
     Pband=alog10(fft_result2(*,*,i)/float(zpt*tres)+1.0e-22)
