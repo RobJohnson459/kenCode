@@ -46,10 +46,11 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
   ;---------------------User Defined Variables----------------------------------------------;
-  LocationToSaveTo = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'
-
-
+LocationToSaveTo = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'
 imageNum = 30
+
+
+
 dataSize=size(img)
 dataTime=dataSize(3)
 ddt=floor(dataTime/imageNum)
@@ -59,8 +60,8 @@ FOR q=0,ddt-1 DO BEGIN
   ENDIF
   FILE = LocationToSaveTo +string(q)
    
-  img5=img(*,*,q*imageNum:(q+4)*imageNum)
-  img5=img5-mean(img5)
+  deviationData=img(*,*,q*imageNum:(q+4)*imageNum)
+  deviationData=deviationData-mean(deviationData)
 
 
 
@@ -71,7 +72,7 @@ FOR q=0,ddt-1 DO BEGIN
   dx=FLOAT(dx)
   dy=FLOAT(dy)
   ;-----------------------Image Size--------------------------------------------------------;
-  imgSize=size(img5) ;Get image size
+  imgSize=size(deviationData) ;Get image size
   nx=imgSize(1)     ;Image size in x axis
   ny=nx             ;Image size in y axis
   nt=imgSize(3)     ;Image size in time
@@ -95,7 +96,7 @@ FOR q=0,ddt-1 DO BEGIN
 
   ;-----------------------Set sampling period-----------------------------------------------;
 
-  tres=FLOAT(dt)
+  tres=float(dt)
   tr_min=t_min   ;Period minimum (s)
   tr_max=t_max   ;Period maximum (s)
   tr1=round([zpt/2.-zpt/fix(tr_min/tres),zpt/2.-zpt/fix(tr_max/tres)]) ;Period range
@@ -186,7 +187,7 @@ FOR q=0,ddt-1 DO BEGIN
   
   FOR t=0,nx-1 DO BEGIN
    FOR d=0,ny-1 DO BEGIN
-     img2(t,d,*)=img5(t,d,*);*hanning(nt)
+     img2(t,d,*)=deviationData(t,d,*);*hanning(nt)
    ENDFOR
   ENDFOR
   ;---------------Prewhitening process----------------------------------------------------------------;
@@ -331,7 +332,7 @@ FOR q=0,ddt-1 DO BEGIN
   FOR ca4=0,tt1-1 DO BEGIN
     FOR ca1=0,xy1-1 DO BEGIN
       FOR ca2=0,xy1-1 DO BEGIN
-        IF (v1a(ca1,ca2,ca4) GT Vp_min) and (v1a(ca1,ca2,ca4) LE Vp_max) and ((v1a(ca1,ca2,ca4) NE 0)) and (xgo1(ca1,ca2,ca4) NE 999) THEN BEGIN
+        IF (v1a(ca1,ca2,ca4) GT Vp_min) AND (v1a(ca1,ca2,ca4) LE Vp_max) AND ((v1a(ca1,ca2,ca4) NE 0)) AND (xgo1(ca1,ca2,ca4) NE 999) THEN BEGIN
           v2(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=fft_result2(ca1,ca2,ca4)*jacobian1(ca1,ca2,ca4)
           v3(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=1.0
         ENDIF
@@ -380,7 +381,7 @@ FOR q=0,ddt-1 DO BEGIN
     FOR is1=(sz2-1)/2-sz3,(sz2-1)/2+sz3 DO BEGIN
       FOR is2=(sz2-1)/2-sz3,(sz2-1)/2+sz3 DO BEGIN
         spr1=sqrt(ax3(is1)^2+ax3(is2)^2)
-        IF (spr1 ge phsp_range(0,ts1)) and (spr1 LE phsp_range(1,ts1)) and (spr1 GT Vp_min) and (spr1 LE Vp_max) THEN BEGIN
+        IF (spr1 ge phsp_range(0,ts1)) AND (spr1 LE phsp_range(1,ts1)) AND (spr1 GT Vp_min) AND (spr1 LE Vp_max) THEN BEGIN
           is3=-1
           repeat BEGIN
             is3=is3+1
@@ -480,10 +481,10 @@ FOR q=0,ddt-1 DO BEGIN
   ;================================================================================
 
 
-NAME=FILE+'_TOTAL.csv'
-NAME=NAME.compress()
+  NAME=FILE+'_TOTAL.csv'
+  NAME=NAME.compress()
   WRITE_CSV,NAME,FINAL_DATA
 TOC
   
- ENDFOR
+ENDFOR
 end
