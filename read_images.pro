@@ -4,14 +4,16 @@
 
 PRO read_images, date1, deviationData, sourceFile
 
-
+;-----------------User Defined Variables--------------------;
 dateRange='Jun26-27'
+sourcePath = 'C:\Users\Masaru\Desktop\'
+;---------------End User Defined Variables------------------;
 
 
 saver = '\'+dateRange+'TempOH.sav'
 
 
-sourceFile='C:\Users\Masaru\Desktop\'+dateRange+'\Processed'
+sourceFile= sourcePath +dateRange+'\Processed'
 tempFiles = FILE_SEARCH(sourceFile + '\TempOH_caun****.tif') ;dt=37sec
 
 
