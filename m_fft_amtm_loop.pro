@@ -45,21 +45,22 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   ; -
 
 
+  ;---------------------User Defined Variables----------------------------------------------;
+  LocationToSaveTo = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'
 
 
-
-  imageNum = 30
-  dataSize=size(img)
-  dataTime=dataSize(3)
-  ddt=floor(dataTime/dataSize)
-  FOR q=0,ddt-1 DO BEGIN
-    IF q GT 226 THEN BEGIN
-      STOP
-    ENDIF
-    FILE = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'+string(q)
+imageNum = 30
+dataSize=size(img)
+dataTime=dataSize(3)
+ddt=floor(dataTime/dataSize)
+FOR q=0,ddt-1 DO BEGIN
+  IF q GT 226 THEN BEGIN
+    STOP
+  ENDIF
+  FILE = LocationToSaveTo +string(q)
    
-    img5=img(*,*,q*imageNum:(q+4)*imageNum)
-    img5=img5-mean(img5)
+  img5=img(*,*,q*imageNum:(q+4)*imageNum)
+  img5=img5-mean(img5)
 
 
 
