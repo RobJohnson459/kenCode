@@ -46,7 +46,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
   ;---------------------User Defined Variables----------------------------------------------;
-LocationToSaveTo = 'C:\Users\Masaru\Desktop\DefNotFake\TempOH'
+LocationToSaveTo = 'C:\Users\Masaru\Desktop\PFRR_Jan12-13_FULL\TempOH'
 imageNum = 30
 
 
@@ -54,8 +54,10 @@ imageNum = 30
 dataSize=size(img)
 dataTime=dataSize(3)
 ddt=floor(dataTime/imageNum)
+Power=fltarr(ddt-2)
+
 FOR q=0,ddt-1 DO BEGIN
-  IF q GT 226 THEN BEGIN
+  IF q GT ddt-2 THEN BEGIN
     STOP
   ENDIF
   FILE = LocationToSaveTo +string(q)
@@ -249,8 +251,14 @@ FOR q=0,ddt-1 DO BEGIN
     NAME=FILE+'_WN_'+string(i)+'.csv'
     FILES=NAME.compress()
     WRITE_CSV,FILES,Pband
+    
+;    Pband=alog10(fft_result1(*,*,i)/float(zpt*tres)+1.0e-22)
+;    NAME=FILE+'_WNfull_'+string(i)+'.csv'
+;    FILES=NAME.compress()
+;    WRITE_CSV,FILES,Pband
   ENDFOR
 
+Power(q)=TOTAL(fft_result2)/((zpt*dt)*(zpx*dx)^2)
 
   IF (xy1 mod 2) EQ 1 THEN BEGIN
     ax1=fltarr(xy1)
@@ -348,11 +356,11 @@ FOR q=0,ddt-1 DO BEGIN
   v4(*,*,*)=v2(*,*,*)/v3(*,*,*)
   convol_result=v4  ;Phase speed array before interpolation
 
-
-  v5 = total(convol_result(*,*,*)/float(zpt*tres),3)
-  NAME=FILE+'_PS.csv'
-  NAME=NAME.compress()
-  WRITE_CSV,NAME,v5
+;
+;  v5 = total(convol_result(*,*,*)/float(zpt*tres),3)
+;  NAME=FILE+'_PS.csv'
+;  NAME=NAME.compress()
+;  WRITE_CSV,NAME,v5
 
   ;------------Make interpolation table-----------------------------------------------------------------------------;
 
