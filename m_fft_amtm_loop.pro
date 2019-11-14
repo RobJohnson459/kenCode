@@ -252,6 +252,7 @@ FOR q=0,ddt-1 DO BEGIN
     FILES=NAME.compress()
     WRITE_CSV,FILES,Pband
     
+;    Uncomment this to recieve the full data
 ;    Pband=alog10(fft_result1(*,*,i)/float(zpt*tres)+1.0e-22)
 ;    NAME=FILE+'_WNfull_'+string(i)+'.csv'
 ;    FILES=NAME.compress()
@@ -276,9 +277,9 @@ Power(q)=TOTAL(fft_result2)/((zpt*dt)*(zpx*dx)^2)
   r=fltarr(xy1,xy1) ;Radius of the circle
 
 
-  FOR i1=0,xy1-1 DO BEGIN
-    FOR i2=0,xy1-1 DO BEGIN
-      r(i1,i2)=sqrt(ax1(i1)^2+ax1(i2)^2)
+  FOR i=0,xy1-1 DO BEGIN
+    FOR j=0,xy1-1 DO BEGIN
+      r(i,j)=sqrt(ax1(i)^2+ax1(j)^2)
     ENDFOR
   ENDFOR
 
