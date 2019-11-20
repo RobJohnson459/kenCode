@@ -5,8 +5,8 @@
 PRO read_images, date1, deviationData, sourceFile
 
 ;-----------------User Defined Variables--------------------;
-dateRange='Jun26-27'
-sourcePath = 'C:\Users\Masaru\Desktop\'
+dateRange='Apr23-24'
+sourcePath = 'D:\April 2018\'
 ;---------------End User Defined Variables------------------;
 
 

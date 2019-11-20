@@ -46,7 +46,8 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
   ;---------------------User Defined Variables----------------------------------------------;
-LocationToSaveTo = 'C:\Users\Masaru\Desktop\PFRR_Jan12-13_FULL\TempOH'
+LocationToSaveTo = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\April2018'
+LocationToSaveTo = LocationToSaveTo + '\TempOH'
 imageNum = 30
 
 
@@ -62,7 +63,7 @@ FOR q=0,ddt-1 DO BEGIN
   ENDIF
   FILE = LocationToSaveTo +string(q)
    
-  deviationData=img(*,*,q*imageNum:(q+4)*imageNum)
+  deviationData=img(*,*,q*imageNum:(q+4)*imageNum) ;;;;;Here is where I meant that the mean is subtracted each loop. KZ
   deviationData=deviationData-mean(deviationData)
 
 
@@ -259,7 +260,11 @@ FOR q=0,ddt-1 DO BEGIN
 ;    WRITE_CSV,FILES,Pband
   ENDFOR
 
-Power(q)=TOTAL(fft_result2)/((zpt*dt)*(zpx*dx)^2)
+;Printing out Total FFT Power (Variance) of T' 
+Power(q)=TOTAL(fft_result2)/((zpt*dt)*(zpx*dx)^2)   
+NAME=FILE+'_POW_'+'.csv'
+FILES=NAME.compress()
+WRITE_CSV,FILES,Power
 
   IF (xy1 mod 2) EQ 1 THEN BEGIN
     ax1=fltarr(xy1)
