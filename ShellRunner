@@ -1,0 +1,22 @@
+PRO ShellRunner,
+
+; read what months we have to do from /<driveName>/months.txt
+
+
+
+; loop over all the months
+;FOR
+
+; read what days to do from /<month_variable_location>/days.txt
+; 
+; FOR
+
+; read what frames to start and end on from /<driveName>/<month_variable_location>/<day_number>.txt
+; 
+; 
+; call read_images.pro
+;   start = start, end = end, saver = receptacleLocation + month.string + day.string, 
+; ENDFOR
+;ENDFOR
+;   
+;   
