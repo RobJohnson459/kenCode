@@ -7,15 +7,15 @@ PRO ShellRunner,
 ; loop over all the months
 ;FOR
 
-; read what days to do from /<month_variable_location>/days.txt
+; read what month name to use from first line of days.txt
 ; 
-; FOR
-
-; read what frames to start and end on from /<driveName>/<month_variable_location>/<day_number>.txt
+; FOR a in individualDaysArray (Yeah, this is python. Its also pseudocode. I'm allowed to write how I need to convey the idea to myself and only myself. Holy cow I'm droning on.
+;   start = a[0] end = a[1] month = month, day = position
+;
 ; 
 ; 
 ; call read_images.pro
-;   start = start, end = end, saver = receptacleLocation + month.string + day.string, 
+;   start = start, end = end, saver = userDefinedReceptacleLocation + month.string + day.string, 
 ; ENDFOR
 ;ENDFOR
 ;   
