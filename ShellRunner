@@ -10,7 +10,7 @@ PRO ShellRunner,
 ; read what month name to use from first line of days.txt
 ; 
 ; FOR a in individualDaysArray (Yeah, this is python. Its also pseudocode. I'm allowed to write how I need to convey the idea to myself and only myself. Holy cow I'm droning on.
-;   start = a[0] end = a[1] month = month, day = position
+;   start = a[1] end = a[2] month = month, day = position
 ;
 ; 
 ; 
