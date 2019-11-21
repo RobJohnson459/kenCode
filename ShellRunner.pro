@@ -1,8 +1,16 @@
-PRO ShellRunner,
+PRO ShellRunner
 
 ; read what months we have to do from /<driveName>/months.txt
+openr, 2, 'D:months.txt'
+monthsArray = []
+dataReader = ''
+WHILE  NOT eof(2) DO BEGIN
+  readf, 2, dataReader
+  monthsArray = [monthsArray, dataReader]
+ENDWHILE
+close, 2
 
-
+;print, monthsArray; Unit test PASSED
 
 ; loop over all the months
 ;FOR
@@ -20,3 +28,4 @@ PRO ShellRunner,
 ;ENDFOR
 ;   
 ;   
+END
