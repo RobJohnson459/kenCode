@@ -4,7 +4,7 @@ PRO ShellRunner
 openr, 2, 'D:months.txt'
 monthsArray = []
 dataReader = ''
-WHILE  NOT eof(2) DO BEGIN
+WHILE NOT eof(2) DO BEGIN
   readf, 2, dataReader
   monthsArray = [monthsArray, dataReader]
 ENDWHILE
@@ -13,19 +13,22 @@ close, 2
 ;print, monthsArray; Unit test PASSED
 
 ; loop over all the months
-;FOR
-
-; read what month name to use from first line of days.txt
-; 
-; FOR a in individualDaysArray (Yeah, this is python. Its also pseudocode. I'm allowed to write how I need to convey the idea to myself and only myself. Holy cow I'm droning on.
-;   start = a[1] end = a[2] month = month, day = position
-;
-; 
-; 
-; call read_images.pro
-;   start = start, end = end, saver = userDefinedReceptacleLocation + month.string + day.string, 
-; ENDFOR
-;ENDFOR
+FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
+  openr, 2, 'D:' + monthsArray[i] + '\days.txt'
+  monthName = '' ;the first element is the needed opener for each directory
+  readf, 2, monthName
+  daysArray = []
+  ; put all the days in an array
+  WHILE NOT eof(2) DO BEGIN
+    readf, 2, dataReader
+    daysArray = [daysArray, dataReader]
+  ENDWHILE
+  close, 2
+  FOR j=0, N_ELEMENTS(daysArray)-1 DO BEGIN ; go through all the days in the array
+    dayInfo = daysArray[j].split(' ')
+;    read_images(monthName + dayInfo[0], 'D:' + monthsArray[i] + '\' , uint(daysInfo[1]), uint(daysInfo[2])
+  ENDFOR
+ENDFOR
 ;   
 ;   
 END
