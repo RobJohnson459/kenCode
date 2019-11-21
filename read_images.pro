@@ -2,32 +2,31 @@
 
 
 
-PRO read_images, date1, deviationData, sourceFile
+PRO read_images, dateString=dateString, sourcePath=sourcePath, begins=begins, ends=ends, 
 
 ;-----------------User Defined Variables--------------------;
-dateRange='Apr23-24'
-sourcePath = 'D:\April 2018\'
+IF (keyword_set(begins)) THEN begins = begins + 1 ELSE begins = 0
+IF (keyword_set(ends)) THEN ends = ends -1 ELSE ends = -1
+IF NOT (keyword_set(dateString)) THEN dateString = 'apr19-20'
+IF NOT (keyword_set(sourcePath)) THEN sourcePath = 'D:\April 2018\'
 ;---------------End User Defined Variables------------------;
 
 
-saver = '\'+dateRange+'TempOH.sav'
+saver = '\'+dateString+'TempOH.sav'
 
 
-sourceFile= sourcePath +dateRange+'\Processed'
+sourceFile= sourcePath +dateString+'\Processed'
 tempFiles = FILE_SEARCH(sourceFile + '\TempOH_caun****.tif') ;dt=37sec
 
 
-frames = N_ELEMENTS(tempFiles)
-;begins = 1233
-;ends = 2804
-;
-;frames = ends-begins+1
+IF ends LE 0 THEN ends = N_ELEMENTS(tempFiles)
+frames = ends-begins+1
 shortPeriodData = FLTARR(256, 256, frames)
 dataInMinutes = FLTARR(256, 256, frames)
 nightAverage = FLTARR(256, 256)
 
 
-FOR i = 0, frames-1 DO BEGIN
+FOR i = begins, frames-1 DO BEGIN
  ;Note!! The procedure "READ_TIFF" reads the tiff file upside down.
   correctedImages = ROTATE(READ_TIFF(tempFiles(i)), 7)
   shortPeriodData(*,*,i) = correctedImages(32:319 - 32, *)
@@ -46,7 +45,7 @@ u_time=ulonarr(3)   ;UT (ss, mm, hh)
 ;the open and read actions here are to get us the First time so we can use it later.
 ;This leads to the question - what is faster? reading one more file or an if statement frames times?
 ;alternate solution: First = 61. It is an unreachable number, so it will always trigger the if statement.
-fname=tempFiles(0)
+fname=tempFiles(begins)
 openr,1,fname
 readu,1,h1,h2,h3
 readu,1,img_size,intensity
@@ -56,7 +55,7 @@ First = u_time(1)
 m=0
 dataInMinutes(*,*,0)=shortPeriodData(*,*,0)
 
-FOR k =0, frames-1 DO BEGIN ; put the data into minutes. If two frames occupy the same minute, average them.
+FOR k = begins, frames-1 DO BEGIN ; put the data into minutes. If two frames occupy the same minute, average them.
  
   fname=tempFiles(k)
   openr,1,fname
