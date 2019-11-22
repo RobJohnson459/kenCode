@@ -33,14 +33,15 @@ FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
     IF j GT 1 THEN BEGIN
       IF dayInfo[0].equals(daysArray[j-1]) THEN BEGIN
         dirSubtitle = dayInfo[1] + '-' + dayInfo[2]
-      ENDIF ELSE BEGIN
-        IF j LT (loopEnd -1) THEN BEGIN
-          IF dayInfo[0].equals(daysArray[j+1].split(' ')[0]) THEN BEGIN
-            dirSubtitle = dayInfo[1] + '-' + dayInfo[2]
-          ENDIF
-        ENDIF
-      ENDELSE
+      ENDIF
     ENDIF
+          
+    IF j LT (loopEnd -1) THEN BEGIN
+      IF dayInfo[0].equals(daysArray[j+1].split(' ')[0]) THEN BEGIN
+        dirSubtitle = dayInfo[1] + '-' + dayInfo[2]
+      ENDIF
+    ENDIF
+
     
     FILE_MKDIR, 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\' + monthsArray[j] + '\' + monthName + dayInfo[0] + dirSubtitle
     read_images(dateString = monthName + dayInfo[0], sourcePath = 'D:' + monthsArray[i] + '\' , begins = uint(daysInfo[1]), ends = uint(daysInfo[2]), 
