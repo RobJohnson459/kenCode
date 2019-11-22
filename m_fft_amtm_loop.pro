@@ -46,7 +46,7 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
   ;---------------------User Defined Variables----------------------------------------------;
-IF NOT (keyword_set(LocationToSaveTo) THEN BEGIN
+IF NOT (keyword_set(LocationToSaveTo)) THEN BEGIN
   locationToSaveTo = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\April2018'
 ENDIF
 LocationToSaveTo = LocationToSaveTo + '\TempOH'
@@ -60,6 +60,7 @@ ddt=floor(dataTime/imageNum)
 Power=fltarr(ddt-2)
 
 FOR q=0,ddt-1 DO BEGIN
+  print, q
   IF q GT ddt-2 THEN BEGIN
     STOP
   ENDIF
@@ -110,19 +111,19 @@ FOR q=0,ddt-1 DO BEGIN
   ;-------------------Check IF the horizontal wavelength inputs are correct------------------;
 
   IF LH_max LE LH_min THEN BEGIN
-    print, 'WARNING: LH_max should be larger than LH_min!'
+    ;print, 'WARNING: LH_max should be larger than LH_min!'
     stop
   ENDIF ELSE BEGIN
     IF LH_min LE 1000 THEN BEGIN
-      print, 'WARNING: Horizontal wavelength value should be in meter!'
+      ;print, 'WARNING: Horizontal wavelength value should be in meter!'
       stop
     ENDIF ELSE BEGIN
       IF LH_min LE (2.*dx) THEN BEGIN
-        print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
+        ;print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
         stop
       ENDIF ELSE BEGIN
         IF LH_max GT (2.*zpx*dx) THEN BEGIN
-          print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
+          ;print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
           stop
         ENDIF
       ENDELSE
@@ -132,16 +133,16 @@ FOR q=0,ddt-1 DO BEGIN
   ;------------------Check IF the wave period inputs are correct--------------------------------;
 
   IF T_max LE T_min THEN BEGIN
-    print, 'WARNING: T_max should be larger than T_min!'
+    ;print, 'WARNING: T_max should be larger than T_min!'
     stop
   ENDIF ELSE BEGIN
     IF T_min LT (2.*dt) THEN BEGIN
-      print, 'WARNING: Wave period minimum should be larger than 2*dt!'
+      ;print, 'WARNING: Wave period minimum should be larger than 2*dt!'
       stop
     ENDIF ELSE BEGIN
       ;ENDELSE
       IF T_max GT (2.*zpt*dt) THEN BEGIN
-        print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
+        ;print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
         stop
       ENDIF
     ENDELSE
@@ -150,15 +151,15 @@ FOR q=0,ddt-1 DO BEGIN
   ;---------------------Check if the zero padding parameter is correct--------------------------;
 
   IF zpx LT nx OR zpx GT 2048 THEN BEGIN
-    print, 'Error: zpx should be in the range between nx and 2048'
+    ;print, 'Error: zpx should be in the range between nx and 2048'
     stop
   ENDIF
   IF zpy LT ny OR zpy GT 2048 THEN BEGIN
-    print, 'Error: zpy should be in the range between ny and 2048'
+    ;print, 'Error: zpy should be in the range between ny and 2048'
     stop
   ENDIF
   IF zpt LT nt OR zpt GT 2048 THEN BEGIN
-    print, 'Error: zpt should be in the range between nt and 2048'
+    ;print, 'Error: zpt should be in the range between nt and 2048'
     stop
   ENDIF
 
@@ -197,7 +198,7 @@ FOR q=0,ddt-1 DO BEGIN
   ENDFOR
   ;---------------Prewhitening process----------------------------------------------------------------;
 
-  print, 'pre-whitening ...', FORMAT='(A,$)'
+  ;print, 'pre-whitening ...', FORMAT='(A,$)'
   IF (nt-1) EQ (floor((nt-1)/2.0)*2) THEN BEGIN ;even case
     ran1=icen-(nt-1)/2 & ran2=icen+(nt-1)/2 & ran3=zpt/2-(nt-1)/2 & ran4=zpt/2+(nt-1)/2
   ENDIF ELSE BEGIN ;odd case
@@ -211,7 +212,7 @@ FOR q=0,ddt-1 DO BEGIN
     img3(*,*,pw1)=convol(prewhite1,fker) ;Prewhitening result
 
   ENDFOR
-  print, ' done'
+  ;print, ' done'
   
   
   ;---------------------Zero padding------------------------------------------------------------------;
@@ -222,20 +223,20 @@ FOR q=0,ddt-1 DO BEGIN
 
   ;--------------------Apply Hanning window (not applied in time dimension)---------------------------;
 
-  print, 'hanning Window ... ', FORMAT='(A,$)'
+  ;print, 'hanning Window ... ', FORMAT='(A,$)'
   FOR le1=ran3(0),ran4(0) DO fa1(rr1:rr2,rr1:rr2,le1)=img3(*,*,le1)*HANNING(nx,ny)
   
-  print, 'done'
+  ;print, 'done'
   ;---------------------3D FFT------------------------------------------------------------------------;
 
-  print, '3D FFT ...', FORMAT='(A,$)'
+  ;print, '3D FFT ...', FORMAT='(A,$)'
   fft_result1(*,*,*)=2.0*((abs(FFT(fa1(*,*,*),/center)))^2) ;Initial FFT result for whole spectrum (k,l,w)
   fvalue=((float(zpx)^2)*float(zpt))/((float(nx)^2)*float((nt))) ;Correction factor
 
-  print, 'done'
+  ;print, 'done'
   ;--------------------Recoloring----------------------------------------------------------------------;
 
-  print, 'recoloring ... ', FORMAT='(A,$)'
+  ;print, 'recoloring ... ', FORMAT='(A,$)'
   FOR le2=0,zpt-1 DO fft_result1(1:zpx-1,1:zpy-1,le2)=fft_result1(1:zpx-1,1:zpy-1,le2)*(((float(zpx*dx)*float(zpy*dy))*float(zpt))*fvalue(0))*float(tres)/fres(*,*)
   sr1=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpx/2+fix(float(zpx*dx)/float(LH_min))]
   fft_result2=fft_result1(sr1(0):sr1(1),sr1(0):sr1(1),tr1(0):tr1(1)) ;FFT result limited between LH_min and LH_max
@@ -315,7 +316,7 @@ WRITE_CSV,FILES,Power
   xgo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*cos(angle1a(*,*,*)))
   ygo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*sin(angle1a(*,*,*)))
 
-  print,'done'
+  ;print,'done'
   ;---------------Masking---------------------------------------------------------------------------------;
 
   mask1a=fltarr(xy1,xy1)
@@ -344,7 +345,7 @@ WRITE_CSV,FILES,Power
 
   ;------------------------Conversion to phase speed domain----------------------------------------------------------------------------------;
 
-  print, 'conversion to phase speed ... ', FORMAT='(A,$)'
+  ;print, 'conversion to phase speed ... ', FORMAT='(A,$)'
   FOR ca4=0,tt1-1 DO BEGIN
     FOR ca1=0,xy1-1 DO BEGIN
       FOR ca2=0,xy1-1 DO BEGIN
@@ -357,7 +358,7 @@ WRITE_CSV,FILES,Power
   ENDFOR
   
   
-  print, 'done'
+  ;print, 'done'
   
   
   v3(where(v3 EQ 0.0))=1.0
@@ -417,15 +418,15 @@ WRITE_CSV,FILES,Power
 
   ;------Get the convolution result-----------------------------------------------------------------;
   
-  print, 'convolution ... ', FORMAT='(A,$)'
+  ;print, 'convolution ... ', FORMAT='(A,$)'
   array1_int=convol_result
   fsize_int=size(array1_int) & sz1_int=fsize_int(1) & tt1_int=fsize_int(3)
   sr1_int=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpy/2+fix(float(zpy*dy)/float(LH_min))]
 
-  print, 'done'
+  ;print, 'done'
   ;----------------------Interpolation-------------------------------------------------------------;
   
-  print, 'interpolation', FORMAT='(A,$)'
+  ;print, 'interpolation', FORMAT='(A,$)'
   IF keyword_set(interpolation) THEN BEGIN   ;Matsuda et al., 2014 original interpolation method
     sz2_int=sz1*2-1
     sz3_int=(sz1-1)/2
@@ -485,7 +486,7 @@ WRITE_CSV,FILES,Power
     ENDFOR
   ENDELSE
 
-  print, 'done'
+  ;print, 'done'
   ;----------------Calculate the 2D phase velocity-----------------------------------------------------------;
 
   total_result_new=alog10(total(interpol_result(*,*,*)/float(zpt*tres),3)+1.0e-22) ;2D Phase speed array (vx,vy)

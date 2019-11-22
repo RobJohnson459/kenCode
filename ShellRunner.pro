@@ -31,10 +31,12 @@ FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
     ;The subtitle is to distinguish between data from the same days.
     dirSubtitle = '____' + dayInfo[1] + '-' + dayInfo[2]
 
+    date = monthName + dayInfo[0]
+    path = 'D:' + monthsArray[i] + '\'
+    futurePath = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\newData\' + monthsArray[i] + '\' + monthName + dayInfo[0] + dirSubtitle
     
-    FILE_MKDIR, 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\newData\' + monthsArray[i] + '\' + monthName + dayInfo[0] + dirSubtitle
-    read_images(dateString = monthName + dayInfo[0], sourcePath = 'D:' + monthsArray[i] + '\' , begins = uint(dayInfo[1]), ends = uint(dayInfo[2]), $
-            endDir = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\newData\' + monthsArray[j] + '\' + monthName + dayInfo[0] + dirSubtitle
+    FILE_MKDIR, futurePath
+    q = read_images(dateString = date, sourcePath = path, begins = uint(dayInfo[1]), ends = uint(dayInfo[2]), endDir = futurePath)
 ;            
 ;            This is left for debugging
 ;    print, (monthName + dayInfo[0]), ('D:' + monthsArray[i] + '\' ), uint(dayInfo[1]), uint(dayInfo[2]), $

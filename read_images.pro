@@ -2,7 +2,7 @@
 
 
 
-PRO read_images, dateString=dateString, sourcePath=sourcePath, begins=begins, ends=ends, endDir=endDir
+FUNCTION read_images, dateString=dateString, sourcePath=sourcePath, begins=begins, ends=ends, endDir=endDir
 
 ;-----------------User Defined Variables--------------------;
 IF (keyword_set(begins)) THEN begins = begins + 1 ELSE begins = 0
