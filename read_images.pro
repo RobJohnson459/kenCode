@@ -2,13 +2,14 @@
 
 
 
-PRO read_images, dateString=dateString, sourcePath=sourcePath, begins=begins, ends=ends, 
+PRO read_images, dateString=dateString, sourcePath=sourcePath, begins=begins, ends=ends, endDir=endDir
 
 ;-----------------User Defined Variables--------------------;
 IF (keyword_set(begins)) THEN begins = begins + 1 ELSE begins = 0
 IF (keyword_set(ends)) THEN ends = ends -1 ELSE ends = -1
 IF NOT (keyword_set(dateString)) THEN dateString = 'apr19-20'
-IF NOT (keyword_set(sourcePath)) THEN sourcePath = 'D:\April 2018\'
+IF NOT (keyword_set(sourcePath)) THEN sourcePath = 'D:April 2018\'
+IF NOT (keyword_set(endDir)) THEN endDir = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018'
 ;---------------End User Defined Variables------------------;
 
 
@@ -111,7 +112,7 @@ print,max(deviationData)
 save, deviationData, filename=sourceFile+saver
 
 
-Q=M_FFT_AMTM_LOOP(shortPeriodData)
+Q=M_FFT_AMTM_LOOP(shortPeriodData, locationToSaveTo=endDir)
 
 beep
 END

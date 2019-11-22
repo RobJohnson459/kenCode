@@ -1,7 +1,7 @@
 Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   LH_min=LH_min, LH_max=LH_max, T_min=T_min, T_max=T_max,Vp_min=Vp_min,$
   Vp_max=Vp_max, zpx=zpx, zpy=zpy, zpt=zpt, wn = wn, min1 = min1, max1 = max1,$
-  interpolation=interpolation
+  interpolation=interpolation, locationToSaveTo=locationToSaveTo
   ;+
   ; NAME:
   ;                   MATSUDA_FFT
@@ -46,7 +46,9 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
 
   ;---------------------User Defined Variables----------------------------------------------;
-LocationToSaveTo = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\April2018'
+IF NOT (keyword_set(LocationToSaveTo) THEN BEGIN
+  locationToSaveTo = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\April2018'
+ENDIF
 LocationToSaveTo = LocationToSaveTo + '\TempOH'
 imageNum = 30
 
@@ -253,7 +255,7 @@ FOR q=0,ddt-1 DO BEGIN
     FILES=NAME.compress()
     WRITE_CSV,FILES,Pband
     
-;    Uncomment this to recieve the full data
+; Uncomment this to recieve the full data
 ;    Pband=alog10(fft_result1(*,*,i)/float(zpt*tres)+1.0e-22)
 ;    NAME=FILE+'_WNfull_'+string(i)+'.csv'
 ;    FILES=NAME.compress()
