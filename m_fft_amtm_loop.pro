@@ -61,8 +61,8 @@ Power=fltarr(ddt-2)
 
 FOR q=0,ddt-1 DO BEGIN
   print, q
-  IF q GT ddt-2 THEN BEGIN
-    STOP
+  IF q GT ddt-5 THEN BEGIN
+    END
   ENDIF
   FILE = LocationToSaveTo +string(q)
    
