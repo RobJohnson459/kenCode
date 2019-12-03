@@ -23,14 +23,15 @@ tempFiles = FILE_SEARCH(sourceFile + '\TempOH_caun****.tif') ;dt=37sec
 IF ends LE 0 THEN ends = N_ELEMENTS(tempFiles)
 frames = ends-begins+1
 shortPeriodData = FLTARR(256, 256, frames)
+correctedImages = FLTARR(320, 256, frames)
 dataInMinutes = FLTARR(256, 256, frames)
 nightAverage = FLTARR(256, 256)
 
 
-FOR i = begins, frames-1 DO BEGIN
+FOR i = begins, ends-1 DO BEGIN
  ;Note!! The procedure "READ_TIFF" reads the tiff file upside down.
-  correctedImages = ROTATE(READ_TIFF(tempFiles(i)), 7)
-  shortPeriodData(*,*,i) = correctedImages(32:319 - 32, *)
+  correctedImages(*,*, i-begins) = ROTATE(READ_TIFF(tempFiles(i)), 7)
+  shortPeriodData(*,*,i-begins) = correctedImages(32:319-32,*, i-begins)
  ;ShortPeriodData has a period of ~37 seconds, meaning it has more data than we want read.
 ENDFOR
 shortPeriodData=shortPeriodData/100.0  ;;;;Divide by 100.0 to make Kelvin Temp
@@ -56,7 +57,7 @@ First = u_time(1)
 m=0
 dataInMinutes(*,*,0)=shortPeriodData(*,*,0)
 
-FOR k = begins, frames-1 DO BEGIN ; put the data into minutes. If two frames occupy the same minute, average them.
+FOR k = 0, frames-1 DO BEGIN ; put the data into minutes. If two frames occupy the same minute, average them.
  
   fname=tempFiles(k)
   openr,1,fname

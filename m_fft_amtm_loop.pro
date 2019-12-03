@@ -59,11 +59,11 @@ dataTime=dataSize(3)
 ddt=floor(dataTime/imageNum)
 Power=fltarr(ddt-2)
 
-FOR q=0,ddt-1 DO BEGIN
+FOR q=0,ddt-5 DO BEGIN
   print, q
-  IF q GT ddt-5 THEN BEGIN
-    END
-  ENDIF
+;  IF q GT ddt-5 THEN BEGIN
+;    END
+;  ENDIF
   FILE = LocationToSaveTo +string(q)
    
   deviationData=img(*,*,q*imageNum:(q+4)*imageNum) ;;;;;Here is where I meant that the mean is subtracted each loop. KZ
@@ -427,36 +427,36 @@ WRITE_CSV,FILES,Power
   ;----------------------Interpolation-------------------------------------------------------------;
   
   ;print, 'interpolation', FORMAT='(A,$)'
-  IF keyword_set(interpolation) THEN BEGIN   ;Matsuda et al., 2014 original interpolation method
-    sz2_int=sz1*2-1
-    sz3_int=(sz1-1)/2
-    array2_Int=dblarr(sz2_int,sz2_int,tt1_int)
-    array3_int=dblarr(sz2_int,sz2_int,tt1_int)
-    array3_int1=dblarr(sz2_int,sz2_int,tt1_int)
-    array4_int=dblarr(sz1_int,sz1_int,tt1_int)
-    sarray1_int=intarr(sz2_int,sz2_int,tt1_int)
-
-    array2_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=array1_int(*,*,*)
-    sarray1_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=interpol_table(*,*,*)
-
-    FOR in4=0,tt1_int-1 DO BEGIN
-      FOR in1=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int DO BEGIN
-        FOR in2=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int DO BEGIN
-          in3=sarray1_int(in1,in2,in4)
-          IF  (in3 NE 999) THEN BEGIN
-            IF (in3 GT 0) THEN BEGIN
-              array3_int(in1,in2,in4)=max(array2_int(in1-in3:in1+in3,in2-in3:in2+in3,in4))
-            ENDIF ELSE BEGIN
-              array3_int(in1,in2,in4)=array2_int(in1,in2,in4)
-            ENDELSE
-
-          ENDIF
-        ENDFOR
-      ENDFOR
-    ENDFOR
-    array4_int(*,*,*)=array3_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)
-    interpol_result=array4_int ;Phase speed array after interpolation (vx,vy,w)
-  ENDIF  ELSE BEGIN
+;;  IF keyword_set(interpolation) THEN BEGIN   ;Matsuda et al., 2014 original interpolation method
+;    sz2_int=sz1*2-1
+;    sz3_int=(sz1-1)/2
+;    array2_Int=dblarr(sz2_int,sz2_int,tt1_int)
+;    array3_int=dblarr(sz2_int,sz2_int,tt1_int)
+;    array3_int1=dblarr(sz2_int,sz2_int,tt1_int)
+;    array4_int=dblarr(sz1_int,sz1_int,tt1_int)
+;    sarray1_int=intarr(sz2_int,sz2_int,tt1_int)
+;
+;    array2_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=array1_int(*,*,*)
+;    sarray1_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=interpol_table(*,*,*)
+;
+;    FOR in4=0,tt1_int-1 DO BEGIN
+;      FOR in1=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int DO BEGIN
+;        FOR in2=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int DO BEGIN
+;          in3=sarray1_int(in1,in2,in4)
+;          IF  (in3 NE 999) THEN BEGIN
+;            IF (in3 GT 0) THEN BEGIN
+;              array3_int(in1,in2,in4)=max(array2_int(in1-in3:in1+in3,in2-in3:in2+in3,in4))
+;            ENDIF ELSE BEGIN
+;              array3_int(in1,in2,in4)=array2_int(in1,in2,in4)
+;            ENDELSE
+;
+;          ENDIF
+;        ENDFOR
+;      ENDFOR
+;    ENDFOR
+;    array4_int(*,*,*)=array3_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)
+;    interpol_result=array4_int ;Phase speed array after interpolation (vx,vy,w)
+;;  ENDIF  ELSE BEGIN
 
     FOR in4=0,tt1_int-1 DO BEGIN  ;Triangle interpolation method
       C0 = interpol_table(*, *,in4)
@@ -484,7 +484,7 @@ WRITE_CSV,FILES,Power
       interpol_result(*, *,in4) = c3 ;;Phase speed array after interpolation (vx,vy,w)
 
     ENDFOR
-  ENDELSE
+;  ENDELSE
 
   ;print, 'done'
   ;----------------Calculate the 2D phase velocity-----------------------------------------------------------;

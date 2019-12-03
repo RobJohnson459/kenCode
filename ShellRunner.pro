@@ -6,6 +6,7 @@ monthsArray = []
 dataReader = ''
 WHILE NOT eof(2) DO BEGIN
   readf, 2, dataReader
+  IF dataReader.Contains('#') CONTINUE
   monthsArray = [monthsArray, dataReader]
 ENDWHILE
 close, 2
@@ -21,6 +22,7 @@ FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
   ; put all the days in an array
   WHILE NOT eof(2) DO BEGIN
     readf, 2, dataReader
+      IF dataReader.Contains('#') CONTINUE
     daysArray = [daysArray, dataReader]
   ENDWHILE
   close, 2
@@ -37,6 +39,7 @@ FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
     
     FILE_MKDIR, futurePath
     q = read_images(dateString = date, sourcePath = path, begins = uint(dayInfo[1]), ends = uint(dayInfo[2]), endDir = futurePath)
+    debugStop = 1
 ;            
 ;            This is left for debugging
 ;    print, (monthName + dayInfo[0]), ('D:' + monthsArray[i] + '\' ), uint(dayInfo[1]), uint(dayInfo[2]), $
