@@ -6,8 +6,11 @@ monthsArray = []
 dataReader = ''
 WHILE NOT eof(2) DO BEGIN
   readf, 2, dataReader
-  IF dataReader.Contains('#') CONTINUE
-  monthsArray = [monthsArray, dataReader]
+  IF dataReader.Contains('#') THEN BEGIN
+    CONTINUE
+  ENDIF ELSE BEGIN
+    monthsArray = [monthsArray, dataReader]
+  ENDELSE
 ENDWHILE
 close, 2
 
@@ -22,8 +25,11 @@ FOR i=0, N_ELEMENTS(monthsArray)-1 DO BEGIN ;go through all months in the array
   ; put all the days in an array
   WHILE NOT eof(2) DO BEGIN
     readf, 2, dataReader
-      IF dataReader.Contains('#') CONTINUE
-    daysArray = [daysArray, dataReader]
+      IF dataReader.Contains('#') THEN BEGIN
+        CONTINUE
+      ENDIF ELSE BEGIN
+            daysArray = [daysArray, dataReader]
+      ENDELSE
   ENDWHILE
   close, 2
   loopEnd = N_ELEMENTS(daysArray)-1
