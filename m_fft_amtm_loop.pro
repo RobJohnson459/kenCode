@@ -44,8 +44,9 @@ Function M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   ;                 Kogure, July 2018 (Added triangle interpolation option)
   ; -
 
-
+  ;-----------------------------------------------------------------------------------------;
   ;---------------------User Defined Variables----------------------------------------------;
+  ;-----------------------------------------------------------------------------------------;
 IF NOT (keyword_set(LocationToSaveTo)) THEN BEGIN
   locationToSaveTo = 'C:\Users\Masaru\Documents\robCode\MCM_AMTM_2018\April2018'
 ENDIF
@@ -53,30 +54,135 @@ LocationToSaveTo = LocationToSaveTo + '\TempOH'
 imageNum = 30
 
 
+;-----------------------------------------------------------------------------------------;
+;----------------------Code Premature Exit Conditions-------------------------------------;
+;-----------------------------------------------------------------------------------------;
 
+
+;-------------------Check IF the horizontal wavelength inputs are correct-----------------;
+
+IF LH_max LE LH_min THEN BEGIN
+  ;print, 'WARNING: LH_max should be larger than LH_min!'
+  stop
+ENDIF ELSE BEGIN
+  IF LH_min LE 1000 THEN BEGIN
+    ;print, 'WARNING: Horizontal wavelength value should be in meter!'
+    stop
+  ENDIF ELSE BEGIN
+    IF LH_min LE (2.*dx) THEN BEGIN
+      ;print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
+      stop
+    ENDIF ELSE BEGIN
+      IF LH_max GT (2.*zpx*dx) THEN BEGIN
+        ;print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
+        stop
+      ENDIF
+    ENDELSE
+  ENDELSE
+ENDELSE
+
+;------------------Check IF the wave period inputs are correct--------------------------------;
+
+IF T_max LE T_min THEN BEGIN
+  ;print, 'WARNING: T_max should be larger than T_min!'
+  stop
+ENDIF ELSE BEGIN
+  IF T_min LT (2.*dt) THEN BEGIN
+    ;print, 'WARNING: Wave period minimum should be larger than 2*dt!'
+    stop
+  ENDIF ELSE BEGIN
+    ;ENDELSE
+    IF T_max GT (2.*zpt*dt) THEN BEGIN
+      ;print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
+      stop
+    ENDIF
+  ENDELSE
+ENDELSE
+
+;---------------------Check if the zero padding parameter is correct--------------------------;
+
+IF zpx LT nx OR zpx GT 2048 THEN BEGIN
+  ;print, 'Error: zpx should be in the range between nx and 2048'
+  stop
+ENDIF
+IF zpy LT ny OR zpy GT 2048 THEN BEGIN
+  ;print, 'Error: zpy should be in the range between ny and 2048'
+  stop
+ENDIF
+IF zpt LT nt OR zpt GT 2048 THEN BEGIN
+  ;print, 'Error: zpt should be in the range between nt and 2048'
+  stop
+ENDIF
+
+
+;-----------------------------------------------------------------------------------------;
+;----------------------Other constant variables-------------------------------------------;
+;-----------------------------------------------------------------------------------------;  
 dataSize=size(img)
 dataTime=dataSize(3)
 ddt=floor(dataTime/imageNum)
 Power=fltarr(ddt-2)
 
+;----------------------Set Image Resolution----------------------------------------------;
+IF NOT (keyword_set(dx)) THEN dx=625. ;Image resolution of x axis (m)
+IF NOT (keyword_set(dy)) THEN dy=dx    ;Image resolution of y axis (m)
+IF NOT (keyword_set(dt)) THEN dt=60.   ;Image time resolution (s);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+dx=FLOAT(dx)
+dy=FLOAT(dy)
+
+;-----------------------Set Wave Parameters Input-----------------------------------------;
+
+IF NOT (keyword_set(LH_min)) THEN LH_min= 10000.0         ;Horizontal wavelength minimum (m)
+IF NOT (keyword_set(LH_max)) THEN LH_max= 80000.0       ;Horizontal wavelength maximum (m)
+IF NOT (keyword_set(T_min)) THEN T_min= 5.0*60.0            ;Wave period minimum (s)
+IF NOT (keyword_set(T_max)) THEN T_max= 3600.0       ;Wave period maximum (s)
+IF NOT (keyword_set(Vp_min)) THEN Vp_min= 0.0            ;Wave speed minimum (m/s)
+IF NOT (keyword_set(Vp_max)) THEN Vp_max= 150.0           ;Wave speed maximum (m/s)
+
+;-------------------------Set zero padding parameters------------------------------------;
+
+IF NOT (keyword_set(zpx)) THEN zpx=512.  ;Size of zero padding in x axis
+IF NOT (keyword_set(zpy)) THEN zpy=zpx    ;Size of zero padding in y axis
+IF NOT (keyword_set(zpt)) THEN zpt=2^10.   ;Zero padding size in time dimension
+
+
+;---------------------Pre_whitening filter (Coble et al.1998)-----------------------------------------;
+
+fker=fltarr(11,11) ;Kernel array
+fker(0,5)=-0.0002
+fker(1,*)=[0.0,0.0,-0.0001,-0.0002,-0.0003,0.0008,-0.0003,-0.0002,-0.0001,0.0,0.0]
+fker(2,*)=[0.0,-0.0001,-0.0003,-0.0007,-0.0016,-0.0071,-0.0016,-0.0007,-0.0003,-0.0001,0.0]
+fker(3,*)=[0.0,-0.0002,-0.0007,-0.0020,-0.0032,0.0146,-0.0032,-0.0020,-0.0007,-0.0002,0.0]
+fker(4,*)=[0.0,-0.0003,-0.0016,-0.0032,-0.0291,-0.1721,-0.0291,-0.0032,-0.0016,-0.0003,0.0]
+fker(5,*)=[-0.0002,0.0008,-0.0071,0.0146,-0.1721,1.0219,-0.1721,0.0146,-0.0071,0.0008,-0.0002]
+fker(6,*)=fker(4,*)
+fker(7,*)=fker(3,*)
+fker(8,*)=fker(2,*)
+fker(9,*)=fker(1,*)
+fker(10,*)=fker(0,*)
+
+;---------------------Pre_whitening filter response-------------------------------------------------;
+
+kspec1=fltarr(zpx - 1, zpy-1)
+kspec1(zpx * 0.5 - 1,zpx * 0.5 - 1)=1.0
+kspec2=convol(kspec1,fker)
+kspec3=2.0*((abs(fft(kspec2,/center)))^2)
+fres=kspec3/max(kspec3)
+
+
+
+
+  ;-----------------------------------------------------------------------------------------;
+  ;----------------------------Main looping event-------------------------------------------;
+  ;-----------------------------------------------------------------------------------------;  
 FOR q=0,ddt-5 DO BEGIN
   print, q
-;  IF q GT ddt-5 THEN BEGIN
-;    END
-;  ENDIF
   FILE = LocationToSaveTo +string(q)
    
   deviationData=img(*,*,q*imageNum:(q+4)*imageNum) ;;;;;Here is where I meant that the mean is subtracted each loop. KZ
   deviationData=deviationData-mean(deviationData)
 
 
-
-  ;----------------------Set Image Resolution----------------------------------------------;
-  IF NOT (keyword_set(dx)) THEN dx=625. ;Image resolution of x axis (m)
-  IF NOT (keyword_set(dy)) THEN dy=dx    ;Image resolution of y axis (m)
-  IF NOT (keyword_set(dt)) THEN dt=60.   ;Image time resolution (s);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  dx=FLOAT(dx)
-  dy=FLOAT(dy)
   ;-----------------------Image Size--------------------------------------------------------;
   imgSize=size(deviationData) ;Get image size
   nx=imgSize(1)     ;Image size in x axis
@@ -84,110 +190,12 @@ FOR q=0,ddt-5 DO BEGIN
   nt=imgSize(3)     ;Image size in time
   icen=(nt-1)/2
 
-  ;-----------------------Set Wave Parameters Input-----------------------------------------;
-
-  IF NOT (keyword_set(LH_min)) THEN LH_min= 10000.0         ;Horizontal wavelength minimum (m)
-  IF NOT (keyword_set(LH_max)) THEN LH_max= 80000.0       ;Horizontal wavelength maximum (m)
-  IF NOT (keyword_set(T_min)) THEN T_min= 5.0*60.0            ;Wave period minimum (s)
-  IF NOT (keyword_set(T_max)) THEN T_max= 3600.0       ;Wave period maximum (s)
-  IF NOT (keyword_set(Vp_min)) THEN Vp_min= 0.0            ;Wave speed minimum (m/s)
-  IF NOT (keyword_set(Vp_max)) THEN Vp_max= 150.0           ;Wave speed maximum (m/s)
-
-  ;-------------------------Set zero padding parameters------------------------------------;
-
-  IF NOT (keyword_set(zpx)) THEN zpx=512.  ;Size of zero padding in x axis
-  IF NOT (keyword_set(zpy)) THEN zpy=zpx    ;Size of zero padding in y axis
-  IF NOT (keyword_set(zpt)) THEN zpt=2^10.   ;Zero padding size in time dimension
-
-
   ;-----------------------Set sampling period-----------------------------------------------;
 
   tres=float(dt)
   tr_min=t_min   ;Period minimum (s)
   tr_max=t_max   ;Period maximum (s)
   tr1=round([zpt/2.-zpt/fix(tr_min/tres),zpt/2.-zpt/fix(tr_max/tres)]) ;Period range
-
-
-  ;-------------------Check IF the horizontal wavelength inputs are correct------------------;
-
-  IF LH_max LE LH_min THEN BEGIN
-    ;print, 'WARNING: LH_max should be larger than LH_min!'
-    stop
-  ENDIF ELSE BEGIN
-    IF LH_min LE 1000 THEN BEGIN
-      ;print, 'WARNING: Horizontal wavelength value should be in meter!'
-      stop
-    ENDIF ELSE BEGIN
-      IF LH_min LE (2.*dx) THEN BEGIN
-        ;print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
-        stop
-      ENDIF ELSE BEGIN
-        IF LH_max GT (2.*zpx*dx) THEN BEGIN
-          ;print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
-          stop
-        ENDIF
-      ENDELSE
-    ENDELSE
-  ENDELSE
-
-  ;------------------Check IF the wave period inputs are correct--------------------------------;
-
-  IF T_max LE T_min THEN BEGIN
-    ;print, 'WARNING: T_max should be larger than T_min!'
-    stop
-  ENDIF ELSE BEGIN
-    IF T_min LT (2.*dt) THEN BEGIN
-      ;print, 'WARNING: Wave period minimum should be larger than 2*dt!'
-      stop
-    ENDIF ELSE BEGIN
-      ;ENDELSE
-      IF T_max GT (2.*zpt*dt) THEN BEGIN
-        ;print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
-        stop
-      ENDIF
-    ENDELSE
-  ENDELSE
-
-  ;---------------------Check if the zero padding parameter is correct--------------------------;
-
-  IF zpx LT nx OR zpx GT 2048 THEN BEGIN
-    ;print, 'Error: zpx should be in the range between nx and 2048'
-    stop
-  ENDIF
-  IF zpy LT ny OR zpy GT 2048 THEN BEGIN
-    ;print, 'Error: zpy should be in the range between ny and 2048'
-    stop
-  ENDIF
-  IF zpt LT nt OR zpt GT 2048 THEN BEGIN
-    ;print, 'Error: zpt should be in the range between nt and 2048'
-    stop
-  ENDIF
-
-  ;---------------------Pre_whitening filter (Coble et al.1998)-----------------------------------------;
-
-  fker=fltarr(11,11) ;Kernel array
-  fker(0,5)=-0.0002
-  fker(1,*)=[0.0,0.0,-0.0001,-0.0002,-0.0003,0.0008,-0.0003,-0.0002,-0.0001,0.0,0.0]
-  fker(2,*)=[0.0,-0.0001,-0.0003,-0.0007,-0.0016,-0.0071,-0.0016,-0.0007,-0.0003,-0.0001,0.0]
-  fker(3,*)=[0.0,-0.0002,-0.0007,-0.0020,-0.0032,0.0146,-0.0032,-0.0020,-0.0007,-0.0002,0.0]
-  fker(4,*)=[0.0,-0.0003,-0.0016,-0.0032,-0.0291,-0.1721,-0.0291,-0.0032,-0.0016,-0.0003,0.0]
-  fker(5,*)=[-0.0002,0.0008,-0.0071,0.0146,-0.1721,1.0219,-0.1721,0.0146,-0.0071,0.0008,-0.0002]
-  fker(6,*)=fker(4,*)
-  fker(7,*)=fker(3,*)
-  fker(8,*)=fker(2,*)
-  fker(9,*)=fker(1,*)
-  fker(10,*)=fker(0,*)
-
-  ;---------------------Pre_whitening filter response-------------------------------------------------;
-
-  kspec1=fltarr(zpx - 1, zpy-1)
-  kspec1(zpx * 0.5 - 1,zpx * 0.5 - 1)=1.0
-  kspec2=convol(kspec1,fker)
-  kspec3=2.0*((abs(fft(kspec2,/center)))^2)
-  fres=kspec3/max(kspec3)
-  
-  
-  
   
   img2=fltarr(nx,ny,nt)
   
